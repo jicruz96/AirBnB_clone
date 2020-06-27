@@ -12,6 +12,6 @@ amenity.py
 place.py
 review.py
 engine/
-    __init__.py 
+    __init__.py
     file_storage.py
 """

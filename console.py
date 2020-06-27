@@ -38,13 +38,10 @@ class HBNBCommand(cmd.Cmd):
 
         if self.not_a_class(cls_name):
             return
-
         # Create instance of class
         obj = cls_name()
-
         # Save to JSON File
         obj.save()
-
         # Print the ID
         print(obj.id)
 
@@ -53,7 +50,9 @@ class HBNBCommand(cmd.Cmd):
         Prints the string representation of an instance based on the class name and id.
         Ex: $ show BaseModel 1234-1234-1234.
         """
-        if self.not_a_class(cls_name) or self.not_an_instance(id):
+        if self.not_a_class(cls_name):
+            return
+        if self.not_an_instance(id):
             return
         # cls_name.id.__str__()
 
@@ -62,7 +61,9 @@ class HBNBCommand(cmd.Cmd):
         (save the change into the JSON file).
         Ex: $ destroy BaseModel 1234-1234-1234.
         """
-        if self.not_a_class(cls_name) or self.not_an_instance(id):
+        if self.not_a_class(cls_name):
+            return
+        if self.not_an_instance(id):
             return
         # Use storage.something to delete
         # Make sure you "save changes" to JSON file
@@ -75,9 +76,27 @@ class HBNBCommand(cmd.Cmd):
         if cls_name is None:
             pass
             # catch and print all - loop through all, printing __str__
-        if not_a_class(cls_name):
+        if self.not_a_class(cls_name):
             return
         # loop through all in class name, printing __str__
+
+    def do_update(self, cls_name=None, id=None, attr=None, attr_value=None):
+        """
+        Updates an instance based on the class name and id
+        adds or updates attribute and saves the change into the JSON file
+        Ex: $ update BaseModel 1234-1234-1234 email "aibnb@holbertonschool.com".
+        """
+        if self.not_a_class(cls_name):
+            return
+        if self.not_an_instance(id):
+            return
+        if attr is None:
+            print("** attribute name missing **")
+            return
+        if attr_value is None:
+            print("** value missing **")
+            return
+        # set attr_value to attr for cls_name.id
 
     @staticmethod
     def not_a_class(cls_name):
