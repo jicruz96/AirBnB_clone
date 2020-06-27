@@ -1,12 +1,12 @@
 #!/usr/bin/python3
-""" 
+"""
 Defines User Class
 """
 
 
 class User(BaseModel):
-    """ 
-    create User objects 
+    """
+    create User objects
 
     Attributes:
         email (str): user email
@@ -14,6 +14,10 @@ class User(BaseModel):
         first_name (str): first name of the user
         last_name (str): last name of the user
     """
+    email = ""
+    password = ""
+    first_name = ""
+    last_name = ""
     # create public class attributes
     # update FileStorage to manage serialization/deserialization of User
     # update console to allow show, create, destroy, update, and all with User

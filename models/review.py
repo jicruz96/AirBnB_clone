@@ -14,3 +14,6 @@ class Review(BaseModel):
         user_id (str): ID of user leaving review (init'd as empty string)
         text (str): text of review (init'd as empty string)
     """
+    place_id = ""
+    user_id = ""
+    text = ""

@@ -12,7 +12,7 @@ class Place(BaseModel):
     Attributes:
         city_id (str): ID of city that place belongs to
         user_id (str): ID of User who owns place
-        name (str): name of place (init'd as empty string) 
+        name (str): name of place (init'd as empty string)
         description (str): description (init'd as empty string)
         number_rooms (int): number of rooms (init'd at 0)
         number_bathrooms (int): number of bathrooms (init'd at 0)
@@ -22,3 +22,14 @@ class Place(BaseModel):
         longitude (float): longtiude coordinate (init'd at 0.0)
         amenity_ids (list of str): list of amenities provided (init'd as [])
     """
+    city_id = ""
+    user_id = ""
+    name = ""
+    description = ""
+    number_rooms = 0
+    number_bathrooms = 0
+    max_guest = 0
+    price_by_night = 0
+    latitude = 0.0
+    longitude = 0.0
+    amenity_ids = []
