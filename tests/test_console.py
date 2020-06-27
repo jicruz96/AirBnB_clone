@@ -1,12 +1,12 @@
 #!/usr/bin/python3
-""" Contains unittests for FileStorage class """
+""" Contains unittests for HBNBCommand class """
 import unittest
 import os
-from models.engine.file_storage import FileStorage
+from console import HBNBCommand
 
 
-class TestFileStorageClass(unittest.TestCase):
-    """ Tests FileStorage class """
+class TestHBNBCommandClass(unittest.TestCase):
+    """ Tests HBNBCommand class """
 
     def test_all(self):
         """ Tests all method """
