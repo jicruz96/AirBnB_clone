@@ -10,6 +10,8 @@ class TestBaseModelClass(unittest.TestCase):
 
     def test_init(self):
         """ Tests init method """
+        obj = BaseModel()
+        self.assertIsInstance(obj.id, str)
 
     def test_str(self):
         """ Tests __str__ method """
