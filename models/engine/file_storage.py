@@ -4,7 +4,7 @@
 
 
 class FileStorage():
-    """ serializes to / deserializes from a JSON file 
+    """ serializes to / deserializes from a JSON file
 
         Attributes:
             __file_path (str): path to JSON file
