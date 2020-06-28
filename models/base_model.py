@@ -28,16 +28,16 @@ class BaseModel:
         else:
             storage.new() to add new instance to storage
         """
-        if kwargs:
+        if len(kwargs) != 0:
+            ISO_format = "%Y-%m-%dT%H:%M:%S.%f"
+            time = datetime.strptime
             for kw in kwargs:
                 if kw == "id":
                     self.id = kwargs[kw]
                 if kw == "created_at":
-                    self.created_at = datetime.strptime(kwargs[kw],
-                                                        "%Y-%m-%dT%H:%M:%S.%f")
+                    self.created_at = time(kwargs[kw], ISO_format)
                 if kw == "updated_at":
-                    self.updated_at = datetime.strptime(kwargs[kw],
-                                                        "%Y-%m-%dT%H:%M:%S.%f")
+                    self.updated_at = time(kwargs[kw], ISO_format)
         else:
             self.id = str(uuid4())
             self.created_at = datetime.now()
@@ -48,7 +48,8 @@ class BaseModel:
         """
         printing string rep with class name, self.id, self.__dict__
         """
-        str_rep = "[{}] ({}) {}".format(self.__class__, self.id, self.__dict__)
+        cls_name = type(self).__name__
+        str_rep = "[{}] ({}) {}".format(cls_name, self.id, self.__dict__)
         return (str_rep)
 
     def save(self):
@@ -70,9 +71,12 @@ class BaseModel:
                 - use isoformat()
         """
         dict_rep = {}
+        time_format = datetime.isoformat
         for key in self.__dict__:
-            if key == "converted_at" or key == "updated_at":
-                dict_rep[key] = datetime.isoformat(self.__dict__[key])
+            value = self.__dict__[key]
+            if key == "created_at" or key == "updated_at":
+                dict_rep[key] = str(time_format(value))
             else:
-                dict_rep[key] = self.__dict__[key]
-        dict_rep[__class__] = self.__class__
+                dict_rep[key] = value
+        dict_rep["__class__"] = type(self).__name__
+        return dict_rep
