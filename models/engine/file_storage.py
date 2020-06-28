@@ -25,7 +25,7 @@ class FileStorage():
             Args:
                 obj (:obj:`BaseModel`): object to add to __objects dictionary
          """
-        key = "{}.{}".format(cls.__name__(obj), obj.id)
+        key = "{}.{}".format(obj.__class__, obj.id)
         self.__objects[key] = obj.to_dict()
 
     def save(self):

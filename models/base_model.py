@@ -3,7 +3,7 @@
     defines BaseModel class
 """
 
-from __init__ import storage
+from models import storage
 from uuid import uuid4
 from datetime import datetime
 
@@ -39,7 +39,7 @@ class BaseModel:
                     self.updated_at = datetime.strptime(kwargs[kw],
                                                         "%Y-%m-%dT%H:%M:%S.%f")
         else:
-            self.id = (str)uuid4()
+            self.id = str(uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
             storage.new(self)
@@ -48,7 +48,7 @@ class BaseModel:
         """
         printing string rep with class name, self.id, self.__dict__
         """
-        str_rep = "[{}] ({}) {}".format(cls.__name__, self.id, self.__dict__)
+        str_rep = "[{}] ({}) {}".format(self.__class__, self.id, self.__dict__)
         return (str_rep)
 
     def save(self):
@@ -70,9 +70,9 @@ class BaseModel:
                 - use isoformat()
         """
         dict_rep = {}
-        for key, value in self.__dict__:
+        for key in self.__dict__:
             if key == "converted_at" or key == "updated_at":
-                dict_rep[key] = datetime.isoformat(value)
+                dict_rep[key] = datetime.isoformat(self.__dict__[key])
             else:
-                dict_rep[key] = value
-        dict_rep[__class__] = cls.__name__
+                dict_rep[key] = self.__dict__[key]
+        dict_rep[__class__] = self.__class__
