@@ -2,7 +2,6 @@
 """
     defines BaseModel class
 """
-
 from models import storage
 from uuid import uuid4
 from datetime import datetime
@@ -15,29 +14,23 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """
-        our public instance attributes are:
+        Instantiates the BaseModel class
+
+        Note:
+            If a dictionary is provided, dictionary values are used
+
+        Attributes:
             id (str): will be assigned with uuid.uuid4() converted to string
             created_at: will be assigned datetime
             updated_at: assigned with datetime each object is changed
-        *args won't be used
-        if kwargs is not empty:
-            each key corresponds to an attribute name
-            (except don't add __class__)
-            values of dictionary correspond to values of attributes
-            note: convert created_at and updated_at into datetime object
-        else:
-            storage.new() to add new instance to storage
         """
         if len(kwargs) != 0:
-            ISO_format = "%Y-%m-%dT%H:%M:%S.%f"
-            time = datetime.strptime
-            for kw in kwargs:
-                if kw == "id":
-                    self.id = kwargs[kw]
-                if kw == "created_at":
-                    self.created_at = time(kwargs[kw], ISO_format)
-                if kw == "updated_at":
-                    self.updated_at = time(kwargs[kw], ISO_format)
+            for key, value in kwargs.items():
+                if key == "created_at" or key == "updated_at":
+                    time = datetime.strptime(value, "%Y-%m-%dT%H:%M:%S.%f")
+                    setattr(self, key, time)
+                elif key != "__class__":
+                    setattr(self, key, value)
         else:
             self.id = str(uuid4())
             self.created_at = datetime.now()
@@ -46,7 +39,8 @@ class BaseModel:
 
     def __str__(self):
         """
-        printing string rep with class name, self.id, self.__dict__
+        prints string representation of class.
+        Format: [<class name>] (<class id>) <class dict>
         """
         cls_name = type(self).__name__
         str_rep = "[{}] ({}) {}".format(cls_name, self.id, self.__dict__)
@@ -54,21 +48,34 @@ class BaseModel:
 
     def save(self):
         """
-        update the updated_at attribute with the current datetime
-        call save(self) method of storage: storage.save()
+        saves class into storage
+
+        Note:
+            'updated_at' attribute is updated on save
         """
         self.updated_at = datetime.now()
+        # Use storage.all() to get dictionary of objects
+        old_dict = storage.all()
+        # Remove the old dictionary representation of self from old_dict
+        del old_dict['{}.{}'.format(type(self).__name__, self.id)]
+        # Then call on storage.new() to save the updated form of self
+        storage.new(self)
         storage.save()
+
+        """ print('THIS IS OLD DICT')
+        print(old_dict['BaseModel.{}'.format(self.id)])
+
+        old_obj = old_dict['BaseModel.{}'.format(self.id)]
+        print('I am BaseModel {}'.format(self.id))
+        print('I am Old BaseModel {}'.format(old_obj['id']))
+        """
 
     def to_dict(self):
         """
-        returns a dictionary with all keys/values of __dict__ of instance
+        returns a dictionary representation of instance
 
-        1. use self.__dict__ to make dictionary
-        2. manually add __class__ to dictionary
         Note:
-            - convert created_at and updated_at to ISO format
-                - use isoformat()
+            times are stored in ISO format
         """
         dict_rep = {}
         time_format = datetime.isoformat
