@@ -17,15 +17,19 @@ class FileStorage():
     __objects = {}  # dictionary - empty but will store objects by class.id
 
     def all(self):
-        """ returns __objects """
+        """ returns dictionary of all saved objects """
         return self.__objects
 
     def new(self, obj):
-        """ sets in __objects the obj with key <obj class name>.id
+        """ 
+        stores obj in __objects dictionary:
+                key = "<obj class name>.id"
+                value = obj.to_dict()
+
             Args:
-                obj (:obj:`BaseModel`): object to add to __objects dictionary
-         """
-        key = "{}.{}".format(obj.__class__, obj.id)
+                obj (:obj:`BaseModel`): object to add to __objects
+        """
+        key = "{}.{}".format(type(obj).__name__, obj.id)
         self.__objects[key] = obj.to_dict()
 
     def save(self):
