@@ -49,12 +49,20 @@ class FileStorage():
         """
 
         if exists(self.__file_path) is False:
-            self.__objects = {}
             return
 
         with open(self.__file_path, 'r') as f:
             dicts = loads(f.read())
 
+        classes = self.known_classes()
+
+        for instance_id, dict in dicts.items():
+            cls_name = instance_id.split('.')[0]
+            cls = classes[cls_name]
+            self.__objects[instance_id] = cls(**dict)
+
+    @staticmethod
+    def known_classes():
         from ..base_model import BaseModel
         from ..amenity import Amenity
         from ..city import City
@@ -63,7 +71,7 @@ class FileStorage():
         from ..state import State
         from ..user import User
 
-        name_to_class = {
+        classes = {
             "Amenity": Amenity,
             "BaseModel": BaseModel,
             "City": City,
@@ -73,7 +81,4 @@ class FileStorage():
             "User": User,
         }
 
-        for instance_id, dict in dicts.items():
-            cls_name = instance_id.split('.')[0]
-            cls = name_to_class[cls_name]
-            self.__objects[instance_id] = cls(**dict)
+        return classes
