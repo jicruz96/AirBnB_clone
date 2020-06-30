@@ -6,20 +6,19 @@ import cmd
 import sys
 
 
+# Ensure it works in both interactive and non-interactive mode
 class HBNBCommand(cmd.Cmd):
     """ Uses cmd methods to control command interpreter """
-    # (hbnb) is our custom prompt
+    # custom prompt:
     prompt = '(hbnb) '
 
-    # Ensure it works in both interactive and non-interactive mode
-    # FIGURE OUT EXACTLY WHY THIS NEEDS TO BE THIS WAY
     def do_quit(self, arg):
         """ Quit command to exit the program """
         return True
 
     def do_EOF(self, arg):
         """ EOF command to exit the program """
-        # FIGURE THIS OUT
+        # Figure this out
         if sys.stdout.isatty():
             print('')
         return True
@@ -103,22 +102,26 @@ class HBNBCommand(cmd.Cmd):
         if cls_name is None:
             print("** class name missing **")
             return True
-        known_classes = ["BaseModel", "User", "State",
-                         "City", "Place", "Amenity", "Review"]
-        if cls_name not in known_classes:
+
+        from models.engine.storage import known_classes
+
+        classes = known_classes()
+
+        if cls_name not in known_classes.:
             print("** class doesn't exist **")
             return True
 
         return False
 
     @staticmethod
-    def not_an_instance(id):
+    def not_an_instance(cls_name, id):
         if id is None:
             print("** instance id missing **")
             return True
-        # if instance doesn't exist:
-            # print("** no instance found **")
-            # return True
+        key = "{}.{}".format(cls_name, id)
+        if key not in storage.all():
+            print("** no instance found **")
+            return True
         return False
 
 
