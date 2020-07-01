@@ -19,9 +19,13 @@ class HBNBCommand(cmd.Cmd):
 
     def do_EOF(self, arg):
         """ EOF command to exit the program """
+        self.non_interactive_check()
+        return True
+
+    @staticmethod
+    def non_interactive_check():
         if sys.stdin.isatty() is False:
             print("")
-        return True
 
     def emptyline(self):
         """ Does nothing, re-prompts """
@@ -34,6 +38,7 @@ class HBNBCommand(cmd.Cmd):
         and prints the id.
             Ex: $ create BaseModel
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         if self.not_a_class(args["cls_name"]):
             return
@@ -48,6 +53,7 @@ class HBNBCommand(cmd.Cmd):
         based on the class name and id.
         Ex: $ show BaseModel 1234-1234-1234.
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         if self.not_a_class(args["cls_name"]):
             return
@@ -62,6 +68,7 @@ class HBNBCommand(cmd.Cmd):
         (save the change into the JSON file).
         Ex: $ destroy BaseModel 1234-1234-1234.
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         if self.not_a_class(args["cls_name"]):
             return
@@ -78,6 +85,7 @@ class HBNBCommand(cmd.Cmd):
         based on the class name or not.
         Ex: $ all BaseModel or $ all.
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         __objects = storage.all()
         print_list = []
@@ -100,6 +108,7 @@ class HBNBCommand(cmd.Cmd):
         adds or updates attribute and saves the change into the JSON file
         Ex: update BaseModel 1234-1234-1234 email "aibnb@holbertonschool.com".
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         if self.not_a_class(args["cls_name"]):
             return
@@ -213,6 +222,7 @@ class HBNBCommand(cmd.Cmd):
             exist, an error message is printed to the user
         """
 
+        self.non_interactive_check()
         try:
             # Parse through input. If parsing fails, send error message
 
