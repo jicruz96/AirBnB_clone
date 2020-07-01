@@ -55,7 +55,7 @@ class FileStorage():
             dicts = loads(f.read())
 
         classes = self.known_classes()
-
+        self.__objects = {}
         for instance_id, dict in dicts.items():
             cls_name = instance_id.split('.')[0]
             cls = classes[cls_name]
