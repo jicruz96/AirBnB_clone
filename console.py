@@ -222,122 +222,72 @@ class HBNBCommand(cmd.Cmd):
             exist, an error message is printed to the user
         """
 
-        self.non_interactive_check()
         try:
-            # Parse through input. If parsing fails, send error message
-
-            # YOU WILL RUN INTO ERRORS HERE WHILE TRYING TO CODE FOR UPDATE
-            # Since update takes in very complex arguments, such as a
-            # dictionary representation, my split('.') trick is likely
-            # to make a jarbled, useless list.
-            # Keep that in mind.
-
-            # input is a list of strings
-            input = line.split('.')
-            # input[0] is class name
-            cls_name = input[0]
-            # method and args are the rest of the input list
-            # THIS SPLIT WILL ALSO MESS YOU UP IN UPDATE. BEWARE
-            method_and_args = input[1].split('(')
-            # store method in method_str
-            method_str = method_and_args[0]
-            # store arg strings in args_list
-            args_list = method_and_args[1:]
-            # create empty args_str string
-            args_str = ''
-            # append arg_list strings to args_str
-            for arg in args_list:
-                args_str += arg
-            # remove the ')' from the end of args_str
-            args_str = args_str[:-1]
+            # split based only on first . character
+            arg_list = line.split('.', 1)
+            # create a dictionary and store the cls_name
+            args = {}
+            args["cls_name"] = arg_list[0]
+            # split rest of string based only on first ( character
+            arg_list = arg_list[1].split('(', 1)
+            args["method"] = arg_list[0]
+            # split arguments like inst_id, attr_name, and attr_value, if arguemnts given
+            if arg_list[1] == ")":
+                arg_list = []
+            else:
+                arg_list = arg_list[1].split(', ')
+                # chops off last ) character
+                arg_list[-1] = arg_list[-1][:-1]
+            # all code below splices off first and last "" characters
+            if len(arg_list) >= 1:
+                args["inst_id"] = arg_list[0][1:-1]
+            else:
+                args["inst_id"] = None
+            if len(arg_list) >= 2:
+                args["attr_name"] = arg_list[1][1:-1]
+            else:
+                args["attr_name"] = None
+            if len(arg_list) >= 3:
+                args["attr_value"] = arg_list[2][1:-1]
+            else:
+                args["attr_value"] = None
         except:
-            # If something failed, then fuck it, just print an error
+            self.non_interactive_check()
             print("** Unknown syntax: " + line)
             return
 
-        # validate cls_name
-        if cls_name not in classes:
-            print("** class doesn't exist **")
-            return
-
         # validate method
-        if method_str not in console_methods:
-            print("** unsupported method: " + method_str + " **")
+        if args["method"] not in console_methods:
+            print("** unsupported method: " + args["method"] + " **")
+            return
+        if args["method"] == "count":
+            method = getattr(self, args["method"])
+            method(args["cls_name"])
             return
 
-        # get static method
+        method_str = "do_" + args["method"]
         method = getattr(self, method_str)
 
-        # execute
-        method(cls_name, args_str)
+        arguments = args["cls_name"]
+        if args["inst_id"] is not None:
+            arguments += " " + args["inst_id"]
+        if args["attr_name"] is not None:
+            arguments += " " + args["attr_name"]
+        if args["attr_value"] is not None:
+            arguments += " " + args["attr_value"]
+
+        method(arguments)
 
     @staticmethod
-    def all(cls_name, args):
-        """ console method that returns all saved objects of type cls_name """
-
-        list_of_instances_of_cls_name = []
-
-        for key, instance in storage.all().items():
-            # If the first part of the key is the same as cls_name
-            #   append the instance to list_of_instances_of_cls_name
-            if key.split('.')[0] == cls_name:
-                list_of_instances_of_cls_name.append(instance)
-
-        # Print instances
-        print('[', end='')
-        number_of_instances = len(list_of_instances_of_cls_name)
-        index = 0
-        for instance in list_of_instances_of_cls_name:
-            print(instance, end='')
-            if index + 1 != number_of_instances:
-                print(', ', end='')
-            index += 1
-        print(']')
-
-    @staticmethod
-    def update(cls_name, args):
-        """ Updates cls_name """
-        # LOGIC
-
-    @staticmethod
-    def show(cls_name, id):
-        """
-        Prints string representation of instance of cls_name with unique ID id
-        """
-
-        key = "{}.{}".format(cls_name, id)
-
-        try:
-            print(storage.all()[key])
-        except:
-            print("** no instance found **")
-
-    @staticmethod
-    def count(cls_name, args):
+    def count(cls_name):
         """ Returns the number of instances of cls_name """
 
+        self.non_interactive_check()
         count = 0
-
         for id, instance in storage.all().items():
             if id.split('.')[0] == cls_name:
                 count += 1
-
         print(count)
-
-    @staticmethod
-    def destroy(cls_name, id):
-        """
-        Destroys instance of cls_name with unique ID id
-        """
-
-        key = "{}.{}".format(cls_name, id)
-
-        try:
-            del storage.all()[key]
-            storage.save()
-        except:
-            print("** no instance found **")
-
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
