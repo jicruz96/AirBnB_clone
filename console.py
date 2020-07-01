@@ -4,11 +4,10 @@ Creating command interpreter
 """
 import cmd
 import sys
-from models.engine.known_objects import classes
+from models.engine.known_objects import classes, console_methods
 from models import storage
 
 
-# Ensure it works in both interactive and non-interactive mode
 class HBNBCommand(cmd.Cmd):
     """ Uses cmd methods to control command interpreter """
     # custom prompt:
@@ -20,9 +19,13 @@ class HBNBCommand(cmd.Cmd):
 
     def do_EOF(self, arg):
         """ EOF command to exit the program """
+        self.non_interactive_check()
+        return True
+
+    @staticmethod
+    def non_interactive_check():
         if sys.stdin.isatty() is False:
             print("")
-        return True
 
     def emptyline(self):
         """ Does nothing, re-prompts """
@@ -35,6 +38,7 @@ class HBNBCommand(cmd.Cmd):
         and prints the id.
             Ex: $ create BaseModel
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         if self.not_a_class(args["cls_name"]):
             return
@@ -49,6 +53,7 @@ class HBNBCommand(cmd.Cmd):
         based on the class name and id.
         Ex: $ show BaseModel 1234-1234-1234.
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         if self.not_a_class(args["cls_name"]):
             return
@@ -63,6 +68,7 @@ class HBNBCommand(cmd.Cmd):
         (save the change into the JSON file).
         Ex: $ destroy BaseModel 1234-1234-1234.
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         if self.not_a_class(args["cls_name"]):
             return
@@ -79,6 +85,7 @@ class HBNBCommand(cmd.Cmd):
         based on the class name or not.
         Ex: $ all BaseModel or $ all.
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         __objects = storage.all()
         print_list = []
@@ -101,6 +108,7 @@ class HBNBCommand(cmd.Cmd):
         adds or updates attribute and saves the change into the JSON file
         Ex: update BaseModel 1234-1234-1234 email "aibnb@holbertonschool.com".
         """
+        self.non_interactive_check()
         args = self.arg_string_parse(arguments)
         if self.not_a_class(args["cls_name"]):
             return
@@ -202,6 +210,133 @@ class HBNBCommand(cmd.Cmd):
             print("** value missing **")
             return True
         return False
+
+    def default(self, line):
+        """
+        Default behavior for unknown commands.
+        Verifies if input is in the format:
+            * <class name>.<console method>
+
+        Note:
+            If input doesn't fit the format, or the class and method don't
+            exist, an error message is printed to the user
+        """
+
+        self.non_interactive_check()
+        try:
+            # Parse through input. If parsing fails, send error message
+
+            # YOU WILL RUN INTO ERRORS HERE WHILE TRYING TO CODE FOR UPDATE
+            # Since update takes in very complex arguments, such as a
+            # dictionary representation, my split('.') trick is likely
+            # to make a jarbled, useless list.
+            # Keep that in mind.
+
+            # input is a list of strings
+            input = line.split('.')
+            # input[0] is class name
+            cls_name = input[0]
+            # method and args are the rest of the input list
+            # THIS SPLIT WILL ALSO MESS YOU UP IN UPDATE. BEWARE
+            method_and_args = input[1].split('(')
+            # store method in method_str
+            method_str = method_and_args[0]
+            # store arg strings in args_list
+            args_list = method_and_args[1:]
+            # create empty args_str string
+            args_str = ''
+            # append arg_list strings to args_str
+            for arg in args_list:
+                args_str += arg
+            # remove the ')' from the end of args_str
+            args_str = args_str[:-1]
+        except:
+            # If something failed, then fuck it, just print an error
+            print("** Unknown syntax: " + line)
+            return
+
+        # validate cls_name
+        if cls_name not in classes:
+            print("** class doesn't exist **")
+            return
+
+        # validate method
+        if method_str not in console_methods:
+            print("** unsupported method: " + method_str + " **")
+            return
+
+        # get static method
+        method = getattr(self, method_str)
+
+        # execute
+        method(cls_name, args_str)
+
+    @staticmethod
+    def all(cls_name, args):
+        """ console method that returns all saved objects of type cls_name """
+
+        list_of_instances_of_cls_name = []
+
+        for key, instance in storage.all().items():
+            # If the first part of the key is the same as cls_name
+            #   append the instance to list_of_instances_of_cls_name
+            if key.split('.')[0] == cls_name:
+                list_of_instances_of_cls_name.append(instance)
+
+        # Print instances
+        print('[', end='')
+        number_of_instances = len(list_of_instances_of_cls_name)
+        index = 0
+        for instance in list_of_instances_of_cls_name:
+            print(instance, end='')
+            if index + 1 != number_of_instances:
+                print(', ', end='')
+            index += 1
+        print(']')
+
+    @staticmethod
+    def update(cls_name, args):
+        """ Updates cls_name """
+        # LOGIC
+
+    @staticmethod
+    def show(cls_name, id):
+        """
+        Prints string representation of instance of cls_name with unique ID id
+        """
+
+        key = "{}.{}".format(cls_name, id)
+
+        try:
+            print(storage.all()[key])
+        except:
+            print("** no instance found **")
+
+    @staticmethod
+    def count(cls_name, args):
+        """ Returns the number of instances of cls_name """
+
+        count = 0
+
+        for id, instance in storage.all().items():
+            if id.split('.')[0] == cls_name:
+                count += 1
+
+        print(count)
+
+    @staticmethod
+    def destroy(cls_name, id):
+        """
+        Destroys instance of cls_name with unique ID id
+        """
+
+        key = "{}.{}".format(cls_name, id)
+
+        try:
+            del storage.all()[key]
+            storage.save()
+        except:
+            print("** no instance found **")
 
 
 if __name__ == "__main__":
