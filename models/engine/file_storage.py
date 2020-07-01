@@ -32,6 +32,7 @@ class FileStorage():
         """
         key = "{}.{}".format(type(obj).__name__, obj.id)
         self.__objects[key] = obj
+        self.save()
 
     def save(self):
         """ serializes __object to the JSON file """
@@ -54,31 +55,10 @@ class FileStorage():
         with open(self.__file_path, 'r') as f:
             dicts = loads(f.read())
 
-        classes = self.known_classes()
+        from .known_objects import classes
+
         self.__objects = {}
-        for instance_id, dict in dicts.items():
-            cls_name = instance_id.split('.')[0]
+        for id, dict in dicts.items():
+            cls_name = id.split('.')[0]
             cls = classes[cls_name]
-            self.__objects[instance_id] = cls(**dict)
-
-    @staticmethod
-    def known_classes():
-        from ..base_model import BaseModel
-        from ..amenity import Amenity
-        from ..city import City
-        from ..place import Place
-        from ..review import Review
-        from ..state import State
-        from ..user import User
-
-        classes = {
-            "Amenity": Amenity,
-            "BaseModel": BaseModel,
-            "City": City,
-            "Place": Place,
-            "Review": Review,
-            "State": State,
-            "User": User,
-        }
-
-        return classes
+            self.__objects[id] = cls(**dict)
