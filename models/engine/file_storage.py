@@ -22,7 +22,7 @@ class FileStorage():
         return self.__objects
 
     def new(self, obj):
-        """ 
+        """
         stores obj in __objects dictionary:
                 key = "<obj class name>.id"
                 value = obj.to_dict()
