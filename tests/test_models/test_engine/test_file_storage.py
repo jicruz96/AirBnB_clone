@@ -2,7 +2,7 @@
 """ Contains unittests for FileStorage class """
 import unittest
 import os
-from models.engine.file_storage import FileStorage
+from models import storage
 from models.base_model import BaseModel
 
 
@@ -12,7 +12,7 @@ class TestFileStorageClass(unittest.TestCase):
     def test_all(self):
         """ Tests all method """
         # create storage instance and instance of BaseModel
-        storage = FileStorage()
+
         obj = BaseModel()
         __objects = storage.all()
         # test that storage.all() returns dictionary
@@ -27,7 +27,6 @@ class TestFileStorageClass(unittest.TestCase):
     def test_new(self):
         """ Tests new method """
         # create storage instance and instance of BaseModel
-        storage = FileStorage()
         obj = BaseModel()
         # create dictionary to set obj values to with **kwargs
         new_dict = {}
@@ -48,6 +47,47 @@ class TestFileStorageClass(unittest.TestCase):
 
     def test_save(self):
         """ Tests save method """
+        # storage = FileStorage()
+        file = "file.json"
+        # Remove file if it exists
+        if os.path.exists(file):
+            os.remove(file)
+        # Test if save creates the file
+        storage.save()
+        self.assertTrue(os.path.exists(file))
+        # Overwrite created file
+        with open(file, 'w') as f:
+            f.write("Placeholder")
+        # Check if save overwrites existing files
+        with open(file, 'r') as f:
+            content = f.read()
+            storage.save()
+            new_content = f.read()
+        self.assertNotEqual(content, new_content)
 
     def test_reload(self):
         """ Tests reload method """
+
+        from json import dumps
+
+        # Check if reloading without doing anything reloads the same thing
+        old_dict = storage.all()
+        storage.reload()
+        new_dict = storage.all()
+        self.assertEqual(old_dict.keys(), new_dict.keys())
+
+        # Make new object and a dictionary for that object
+        obj = BaseModel()
+        obj.id = 1
+        dict_dict = {"BaseModel.1": obj.to_dict()}
+        obje_dict = {"BaseModel.1": obj}
+
+        # Overwrite file.json so that it includes just this dictionary
+        if os.path.exists("file.json"):
+            os.remove("file.json")
+        with open("file.json", 'w') as f:
+            f.write(dumps(dict_dict))
+
+        # Reload
+        storage.reload()
+        self.assertEqual(storage.all().keys(), obje_dict.keys())
