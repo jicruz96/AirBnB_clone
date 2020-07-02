@@ -29,6 +29,7 @@ class HBNBCommand(cmd.Cmd):
 
     def emptyline(self):
         """ Does nothing, re-prompts """
+        self.non_interactive_check()
         pass
 
     def do_create(self, arguments):
@@ -231,11 +232,24 @@ class HBNBCommand(cmd.Cmd):
             # split rest of string based only on first ( character
             arg_list = arg_list[1].split('(', 1)
             args["method"] = arg_list[0]
-            # split arguments like inst_id, attr_name, and attr_value, if arguemnts given
+            # split arguments like inst_id, attr_name, and attr_value, if given
             if arg_list[1] == ")":
                 arg_list = []
             else:
-                arg_list = arg_list[1].split(', ')
+                # split off instance id and check if arguments are dictionary
+                arg_check = arg_list[1].split(', ', 1)
+                if len(arg_check) > 1:
+                    # if dictionary, send to special parsing method
+                    if arg_check[1][0] == '{' and args["method"] == "update":
+                        arg_string = args["cls_name"]
+                        arg_string += " " + arg_check[0] + " " + arg_check[1]
+                        self.update_dictionary(arg_string)
+                        return
+                # if not a dictionary, keep parsing
+                arg_string = arg_check[0]
+                if len(arg_check) > 1:
+                    arg_string += ", " + arg_check[1]
+                arg_list = arg_string.split(', ')
                 # chops off last ) character
                 arg_list[-1] = arg_list[-1][:-1]
             # all code below splices off first and last "" characters
@@ -262,6 +276,7 @@ class HBNBCommand(cmd.Cmd):
             return
         if args["method"] == "count":
             method = getattr(self, args["method"])
+            self.non_interactive_check()
             method(args["cls_name"])
             return
 
@@ -282,12 +297,40 @@ class HBNBCommand(cmd.Cmd):
     def count(cls_name):
         """ Returns the number of instances of cls_name """
 
-        self.non_interactive_check()
         count = 0
         for id, instance in storage.all().items():
             if id.split('.')[0] == cls_name:
                 count += 1
         print(count)
+
+    def update_dictionary(self, arguments):
+        """
+        Parses and runs update method for dictionary args
+        for each attribute name/value pair
+        """
+        # split off class name and instance id
+        arg_list = arguments.split(" ", 2)
+        args = {}
+        args["cls_name"] = arg_list[0]
+        args["inst_id"] = arg_list[1][1:-1]
+        # cut off dictionary {} and closing ) characters
+        dict_string = arg_list[2][1:-2]
+        # split the key/value pairs into list of strings
+        dictionary = dict_string.split(", ")
+        method = getattr(self, "do_update")
+        # for each key/value pair in list
+        for i in range(len(dictionary)):
+            arguments = args["cls_name"] + " " + args["inst_id"] + " "
+            # split key and value and set as strings to be added to arguments
+            dict_kv = dictionary[i].split(": ")
+            args["attr_name"] = dict_kv[0][1:-1]
+            if dict_kv[1][0] == "'" and dict_kv[1][-1] == "'":
+                dict_kv[1] = dict_kv[1][1:-1]
+            args["attr_value"] = dict_kv[1]
+            arguments += args["attr_name"] + " " + args["attr_value"]
+            # pass arguments to update method
+            method(arguments)
+        return
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
