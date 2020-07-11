@@ -1,6 +1,9 @@
 # AirBnB_clone
 The AirBnB clone utilizes higher level programming skills to deploy a copy of the AirBnB website.
 
+## Web Static
+The web static starts building the front end of the AirBnB clone website through simple HTML static pages and style guides.
+
 ## Console
 The console is a command interpreter that manages all AirBnB objects.
 
@@ -8,7 +11,7 @@ The console is a command interpreter that manages all AirBnB objects.
 
 #### Interactive Mode
 ##### Starting on Interactive Mode
-Run `./console.py`to begin a session. 
+Run `./console.py`to begin a session.
 
 A prompt `(hbnb)` should appear where you can type commands followed by a new line.
 After the command is run, you will be reprompted.
@@ -23,13 +26,13 @@ Documented commands (type help <topic>):
 ========================================
 EOF  help  quit
 
-(hbnb) 
-(hbnb) 
-(hbnb) quit 
+(hbnb)
+(hbnb)
+(hbnb) quit
 ```
 
 #### Non-Interactive Mode
-You can also use the console non-interactively. 
+You can also use the console non-interactively.
 ##### Starting by using "echo"
 You can "pipe" an input into the command by using `echo`, as seen below:
 ```
@@ -39,7 +42,7 @@ $ echo "help" | ./console.py
 Documented commands (type help <topic>):
 ========================================
 EOF  help  quit
-(hbnb) 
+(hbnb)
 ```
 ##### Starting with a file of commands
 You can also pipe in a file with one command per line, as seen below:
