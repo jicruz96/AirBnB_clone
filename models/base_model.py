@@ -54,12 +54,6 @@ class BaseModel:
             'updated_at' attribute is updated on save
         """
         self.updated_at = datetime.now()
-        # Use storage.all() to get dictionary of objects
-        old_dict = storage.all()
-        # Remove the old dictionary representation of self from old_dict
-        del old_dict['{}.{}'.format(type(self).__name__, self.id)]
-        # Then call on storage.new() to save the updated form of self
-        storage.new(self)
         storage.save()
 
         """ print('THIS IS OLD DICT')
